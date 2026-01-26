@@ -1,0 +1,12 @@
+[
+  { "id": "weapon_1", "name": "Assault Rifle", "category": "weapon", "tier": "common", "sellValueCred": 150 },
+  { "id": "weapon_2", "name": "SMG", "category": "weapon", "tier": "common", "sellValueCred": 120 },
+  { "id": "weapon_3", "name": "Shotgun", "category": "weapon", "tier": "common", "sellValueCred": 180 },
+  { "id": "weapon_4", "name": "Sniper Rifle", "category": "weapon", "tier": "rare", "sellValueCred": 450 },
+  { "id": "weapon_5", "name": "LMG", "category": "weapon", "tier": "rare", "sellValueCred": 500 },
+  { "id": "weapon_6", "name": "DMR", "category": "weapon", "tier": "rare", "sellValueCred": 400 },
+  { "id": "weapon_7", "name": "Plasma Rifle", "category": "weapon", "tier": "high", "sellValueCred": 1200 },
+  { "id": "weapon_8", "name": "Arc Cannon", "category": "weapon", "tier": "high", "sellValueCred": 1500 },
+  { "id": "weapon_9", "name": "Rocket Launcher", "category": "weapon", "tier": "high", "sellValueCred": 1800 },
+  { "id": "weapon_10", "name": "Pistol", "category": "weapon", "tier": "common", "sellValueCred": 80 }
+]

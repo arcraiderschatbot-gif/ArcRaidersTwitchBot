@@ -1,0 +1,10 @@
+[
+  { "name": "Stella Montis", "difficultyScalar": 1.05, "encounterBias": 1 },
+  { "name": "The Wasteland", "difficultyScalar": 1.0, "encounterBias": 0 },
+  { "name": "Abandoned Outpost", "difficultyScalar": 0.95, "encounterBias": -1 },
+  { "name": "ARC Facility", "difficultyScalar": 1.10, "encounterBias": 1 },
+  { "name": "Desert Ruins", "difficultyScalar": 0.90, "encounterBias": -1 },
+  { "name": "Urban Zone", "difficultyScalar": 1.0, "encounterBias": 0 },
+  { "name": "Mountain Pass", "difficultyScalar": 1.0, "encounterBias": 0 },
+  { "name": "Coastal Base", "difficultyScalar": 0.95, "encounterBias": 0 }
+]

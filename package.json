@@ -1,0 +1,21 @@
+{
+  "name": "arcraids-twitch-bot",
+  "version": "1.0.0",
+  "description": "Twitch chat game + Extension for ARC Raiders",
+  "private": true,
+  "workspaces": [
+    "server",
+    "extension"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=server",
+    "dev:extension": "npm run dev --workspace=extension",
+    "build": "npm run build --workspaces",
+    "start": "npm run start --workspace=server",
+    "test": "npm run test --workspace=server"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3"
+  }
+}

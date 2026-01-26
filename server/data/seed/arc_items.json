@@ -1,0 +1,12 @@
+[
+  { "id": "arc_1", "name": "ARC Core Fragment", "category": "arc", "tier": "common", "sellValueCred": 200 },
+  { "id": "arc_2", "name": "ARC Energy Cell", "category": "arc", "tier": "common", "sellValueCred": 180 },
+  { "id": "arc_3", "name": "ARC Shard", "category": "arc", "tier": "common", "sellValueCred": 150 },
+  { "id": "arc_4", "name": "ARC Stabilizer", "category": "arc", "tier": "rare", "sellValueCred": 600 },
+  { "id": "arc_5", "name": "ARC Resonator", "category": "arc", "tier": "rare", "sellValueCred": 750 },
+  { "id": "arc_6", "name": "ARC Amplifier", "category": "arc", "tier": "rare", "sellValueCred": 650 },
+  { "id": "arc_7", "name": "ARC Core", "category": "arc", "tier": "high", "sellValueCred": 2000 },
+  { "id": "arc_8", "name": "ARC Matrix", "category": "arc", "tier": "high", "sellValueCred": 2500 },
+  { "id": "arc_9", "name": "ARC Catalyst", "category": "arc", "tier": "high", "sellValueCred": 2200 },
+  { "id": "arc_10", "name": "ARC Fragment", "category": "arc", "tier": "common", "sellValueCred": 100 }
+]
