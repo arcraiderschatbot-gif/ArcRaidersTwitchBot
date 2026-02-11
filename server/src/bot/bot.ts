@@ -30,7 +30,7 @@ export class Bot {
 
     this.sendQueue = new SendQueue(config, (msg) => {
       if (this.client) {
-        this.client.say(config.twitch.channel, msg).catch(err => {
+        this.client.say(config.twitch.channel, msg).catch((err: unknown) => {
           console.error('Failed to send message:', err);
         });
       }
@@ -63,7 +63,7 @@ export class Bot {
       channels: [this.config.twitch.channel],
     });
 
-    client.on('message', async (channel, tags, message, self) => {
+    client.on('message', async (channel: string, tags: { username?: string }, message: string, self: boolean) => {
       if (self) return; // Ignore bot's own messages
 
       const username = tags.username || 'unknown';
@@ -85,13 +85,13 @@ export class Bot {
       }
     });
 
-    client.on('connected', (addr, port) => {
+    client.on('connected', (addr: string, port: number) => {
       console.log(`Connected to Twitch IRC at ${addr}:${port}`);
       this.reconnectAttempts = 0;
       this.raidScheduler.start();
     });
 
-    client.on('disconnected', (reason) => {
+    client.on('disconnected', (reason: string) => {
       console.log(`Disconnected: ${reason}`);
       this.raidScheduler.stop();
       this.attemptReconnect();

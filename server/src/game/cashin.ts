@@ -39,7 +39,7 @@ export class CashInSystem {
     return { allowed: true };
   }
 
-  processCashIn(userId: number, option: string): { success: boolean; redemptionId?: number; message?: string } {
+  processCashIn(userId: number, option: string, customText?: string): { success: boolean; redemptionId?: number; message?: string } {
     const check = this.canCashIn(userId, option);
     if (!check.allowed) {
       return { success: false, message: check.reason };
@@ -64,9 +64,12 @@ export class CashInSystem {
       }
     }
 
-    // Create redemption if requires approval
-    if (cashInOption.requiresApproval && this.config.game.streamerApprovalRequired) {
-      const redemptionId = this.repo.createRedemption(userId, option, cashInOption.cost);
+    // Shoutout with custom text always requires approval for display
+    const needsApproval = (cashInOption.requiresApproval && this.config.game.streamerApprovalRequired) ||
+                          (option === 'shoutout' && customText);
+    
+    if (needsApproval) {
+      const redemptionId = this.repo.createRedemption(userId, option, cashInOption.cost, customText);
       return {
         success: true,
         redemptionId,
@@ -77,11 +80,11 @@ export class CashInSystem {
     // Auto-approve automated cash-ins
     return {
       success: true,
-      message: this.getCashInMessage(option, userId),
+      message: this.getCashInMessage(option, userId, customText),
     };
   }
 
-  private getCashInMessage(option: string, userId: number): string {
+  private getCashInMessage(option: string, userId: number, customText?: string): string {
     const user = this.repo.getUserById(userId);
     const name = user?.callsign || user?.twitchName || 'Unknown';
 
@@ -89,7 +92,9 @@ export class CashInSystem {
       ping: `🔔 ${name} sent a ping!`,
       ping2: `🔔 ${name} sent a ping! ⚡`,
       ping3: `🔔 ${name} sent a ping! ⚡🔥`,
-      shoutout: `📢 ${name} requested a shoutout!`,
+      shoutout: customText 
+        ? `📢 ${name} requested a shoutout!`
+        : `📢 ${name} requested a shoutout!`,
       scout: `🔍 ${name} is scouting ahead!`,
       insure: `🛡️ ${name} purchased insurance!`,
       event: `🎉 ${name} triggered an event!`,

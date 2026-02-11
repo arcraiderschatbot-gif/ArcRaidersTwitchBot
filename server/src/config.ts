@@ -3,9 +3,14 @@ export interface Config {
     username: string;
     oauthToken: string;
     channel: string;
+    /** For stream-live check (start bot only when channel is live). */
+    clientId?: string;
+    clientSecret?: string;
   };
   database: {
     path: string;
+    /** When set (e.g. Railway DATABASE_URL), use PostgreSQL instead of SQLite. */
+    url?: string;
   };
   extension: {
     secret: string;
@@ -59,9 +64,12 @@ export const defaultConfig: Config = {
     username: process.env.TWITCH_USERNAME || '',
     oauthToken: process.env.TWITCH_OAUTH_TOKEN || '',
     channel: process.env.TWITCH_CHANNEL || '',
+    clientId: process.env.TWITCH_CLIENT_ID || '',
+    clientSecret: process.env.TWITCH_CLIENT_SECRET || '',
   },
   database: {
     path: process.env.DB_PATH || './data/arcraids.db',
+    url: getDatabaseUrl(),
   },
   extension: {
     secret: process.env.EXTENSION_SECRET || '',
@@ -114,10 +122,28 @@ export const defaultConfig: Config = {
       drop_shields: { cost: 750, requiresApproval: true, description: 'Streamer drops shields' },
       prox_chat: { cost: 1000, requiresApproval: true, description: 'Keep proximity chat on' },
       instigate: { cost: 2000, requiresApproval: true, description: 'Instigate fight' },
-      stella_montis_full: { cost: 5000, requiresApproval: true, description: 'Full loadout Stella Montis' },
+      stella_montis_full: { cost: 35000, requiresApproval: true, description: 'Full loadout Stella Montis' },
     },
   },
 };
+
+/** Railway and other hosts use DATABASE_URL; add sslmode=require for Postgres if missing. */
+function getDatabaseUrl(): string | undefined {
+  const keys = ['DATABASE_URL', 'DATABASE_PUBLIC_URL', 'POSTGRES_DATABASE_URL', 'POSTGRES_URL'];
+  for (const key of keys) {
+    const url = process.env[key];
+    if (url && typeof url === 'string') {
+      const u = url.trim();
+      if (u && u.toLowerCase().startsWith('postgres')) {
+        if (!u.toLowerCase().includes('sslmode=')) {
+          return u + (u.includes('?') ? '&' : '?') + 'sslmode=require';
+        }
+        return u;
+      }
+    }
+  }
+  return undefined;
+}
 
 export function loadConfig(): Config {
   // Read from process.env directly to ensure dotenv-loaded values are used
@@ -127,9 +153,12 @@ export function loadConfig(): Config {
       username: process.env.TWITCH_USERNAME || defaultConfig.twitch.username,
       oauthToken: process.env.TWITCH_OAUTH_TOKEN || defaultConfig.twitch.oauthToken,
       channel: process.env.TWITCH_CHANNEL || defaultConfig.twitch.channel,
+      clientId: process.env.TWITCH_CLIENT_ID || defaultConfig.twitch.clientId,
+      clientSecret: process.env.TWITCH_CLIENT_SECRET || defaultConfig.twitch.clientSecret,
     },
     database: {
       path: process.env.DB_PATH || defaultConfig.database.path,
+      url: getDatabaseUrl(),
     },
     extension: {
       secret: process.env.EXTENSION_SECRET || defaultConfig.extension.secret,

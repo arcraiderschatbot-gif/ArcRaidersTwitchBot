@@ -127,7 +127,7 @@ Then use the Twitch Extension Developer Rig to load the extension panel.
 - `drop_shields` - 750 Cred - Streamer drops all shield rechargers
 - `prox_chat` - 1,000 Cred - Streamer keeps proximity chat on rest of raid
 - `instigate` - 2,000 Cred - Streamer instigates a fight with next raider
-- `stella_montis_full` - 5,000 Cred - Streamer does full loadout (80k cred minimum) into Stella Montis for >=15 minutes
+- `stella_montis_full` - 35,000 Cred - Streamer does full loadout (80k cred minimum) into Stella Montis for >=15 minutes
 
 ## Title Progression
 

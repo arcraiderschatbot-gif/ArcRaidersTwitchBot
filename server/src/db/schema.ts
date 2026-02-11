@@ -20,9 +20,17 @@ export function createSchema(db: Database.Database) {
       cantinaLegend BOOLEAN NOT NULL DEFAULT 0,
       pingCount INTEGER NOT NULL DEFAULT 0,
       killsCredited INTEGER NOT NULL DEFAULT 0,
-      deathsAttributed INTEGER NOT NULL DEFAULT 0
+      deathsAttributed INTEGER NOT NULL DEFAULT 0,
+      banned BOOLEAN NOT NULL DEFAULT 0
     )
   `);
+
+  // Add banned column to existing users table if it doesn't exist (migration)
+  try {
+    db.exec(`ALTER TABLE users ADD COLUMN banned BOOLEAN NOT NULL DEFAULT 0`);
+  } catch (e) {
+    // Column already exists, ignore
+  }
 
   // Titles table
   db.exec(`
@@ -101,9 +109,17 @@ export function createSchema(db: Database.Database) {
       approvedBy TEXT,
       approvedAt INTEGER,
       completedAt INTEGER,
+      customText TEXT,
       FOREIGN KEY (userId) REFERENCES users(id)
     )
   `);
+  
+  // Add customText column to existing redemptions table if it doesn't exist (migration)
+  try {
+    db.exec(`ALTER TABLE redemptions ADD COLUMN customText TEXT`);
+  } catch (e) {
+    // Column already exists, ignore
+  }
 
   // Kills (pairwise ledger)
   db.exec(`

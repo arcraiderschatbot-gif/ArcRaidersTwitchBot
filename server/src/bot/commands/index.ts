@@ -41,6 +41,16 @@ export class CommandHandler {
         }
       } else {
         context.userId = user.id;
+        // Check if user is banned
+        if (user.banned) {
+          return; // Silently ignore commands from banned users
+        }
+      }
+    } else {
+      // Check ban status for existing userId
+      const user = this.repo.getUserById(userId);
+      if (user && user.banned) {
+        return; // Silently ignore commands from banned users
       }
     }
 
@@ -257,7 +267,17 @@ export class CommandHandler {
       return;
     }
 
-    const result = this.cashInSystem.processCashIn(userId, option);
+    // For shoutout, extract custom text (everything after "shoutout")
+    let customText: string | undefined;
+    if (option === 'shoutout' && args.length > 2) {
+      customText = args.slice(2).join(' ').trim();
+      if (!customText) {
+        this.sendQueue.enqueue(`@${username} Usage: !cashin shoutout <your message>`, 1);
+        return;
+      }
+    }
+
+    const result = this.cashInSystem.processCashIn(userId, option, customText);
     if (!result.success) {
       this.sendQueue.enqueue(`@${username} ${result.message}`, 1);
       return;
@@ -265,10 +285,17 @@ export class CommandHandler {
 
     if (result.redemptionId) {
       const cashInOption = this.config.cashin.options[option];
-      this.sendQueue.enqueue(
-        `@${this.config.twitch.channel} ${username} requested ${cashInOption.description}. Broadcaster type !approve or !deny.`,
-        8
-      );
+      if (option === 'shoutout' && customText) {
+        this.sendQueue.enqueue(
+          `@${this.config.twitch.channel} ${username} requested a shoutout. Broadcaster type !approve ${result.redemptionId} or !deny ${result.redemptionId}.`,
+          8
+        );
+      } else {
+        this.sendQueue.enqueue(
+          `@${this.config.twitch.channel} ${username} requested ${cashInOption.description}. Broadcaster type !approve ${result.redemptionId} or !deny ${result.redemptionId}.`,
+          8
+        );
+      }
     } else if (result.message) {
       this.sendQueue.enqueue(result.message, 5);
     }
@@ -379,7 +406,11 @@ export class CommandHandler {
     let response = `@${username} Pending: `;
     const list = redemptions.slice(0, 5).map(r => {
       const option = this.config.cashin.options[r.type];
-      return `#${r.id} ${r.callsign || r.twitchName} - ${option?.description || r.type} (${r.cost} Cred)`;
+      let desc = option?.description || r.type;
+      if (r.type === 'shoutout' && r.customText) {
+        desc = `shoutout: "${r.customText.substring(0, 30)}${r.customText.length > 30 ? '...' : ''}"`;
+      }
+      return `#${r.id} ${r.callsign || r.twitchName} - ${desc} (${r.cost} Cred)`;
     }).join(' | ');
     response += list;
     this.sendQueue.enqueue(response, 3);
@@ -406,10 +437,22 @@ export class CommandHandler {
 
     this.repo.approveRedemption(redemptionId, username);
     const user = this.repo.getUserById(redemption.userId);
-    this.sendQueue.enqueue(
-      `✅ Redemption #${redemptionId} approved for ${user?.callsign || user?.twitchName || 'Unknown'}.`,
-      5
-    );
+    
+    // Show preview for shoutout with custom text
+    if (redemption.type === 'shoutout' && redemption.customText) {
+      const preview = redemption.customText.length > 50 
+        ? redemption.customText.substring(0, 50) + '...'
+        : redemption.customText;
+      this.sendQueue.enqueue(
+        `✅ Shoutout #${redemptionId} approved: "${preview}" - Type !complete ${redemptionId} to display it.`,
+        5
+      );
+    } else {
+      this.sendQueue.enqueue(
+        `✅ Redemption #${redemptionId} approved for ${user?.callsign || user?.twitchName || 'Unknown'}.`,
+        5
+      );
+    }
   }
 
   private async handleDeny(context: CommandContext) {
@@ -461,9 +504,35 @@ export class CommandHandler {
 
     this.repo.completeRedemption(redemptionId);
     const user = this.repo.getUserById(redemption.userId);
-    this.sendQueue.enqueue(
-      `✅ Redemption #${redemptionId} marked complete for ${user?.callsign || user?.twitchName || 'Unknown'}.`,
-      3
-    );
+    
+    // Special handling for shoutout with custom text
+    if (redemption.type === 'shoutout' && redemption.customText) {
+      // Display shoutout in highlighted format (big letters using caps and formatting)
+      const shoutoutText = redemption.customText.toUpperCase();
+      const name = user?.callsign || user?.twitchName || 'Unknown';
+      
+      // Send separator line
+      this.sendQueue.enqueue(
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+        10
+      );
+      
+      // Send shoutout message in big letters
+      this.sendQueue.enqueue(
+        `📢📢📢 SHOUTOUT FROM ${name.toUpperCase()}: ${shoutoutText} 📢📢📢`,
+        10
+      );
+      
+      // Send separator line again
+      this.sendQueue.enqueue(
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+        10
+      );
+    } else {
+      this.sendQueue.enqueue(
+        `✅ Redemption #${redemptionId} marked complete for ${user?.callsign || user?.twitchName || 'Unknown'}.`,
+        3
+      );
+    }
   }
 }
