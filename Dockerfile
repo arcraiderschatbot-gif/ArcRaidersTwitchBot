@@ -3,9 +3,9 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Server (bot + EBS)
+# Server (bot + EBS). Use npm install — lockfile lives at repo root (workspaces).
 COPY server/package*.json ./server/
-RUN cd server && npm ci --omit=dev
+RUN cd server && npm install --omit=dev
 
 COPY server/ ./server/
 RUN cd server && npm run build
