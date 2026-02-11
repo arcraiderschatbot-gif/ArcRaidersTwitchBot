@@ -1,8 +1,9 @@
 # Arc Raiders Twitch Bot — runs server + bot; bot connects only when TWITCH_CHANNEL is live (if TWITCH_CLIENT_ID/SECRET set)
 
-# Stage 1: build (need devDependencies for tsc)
+# Stage 1: build (need devDependencies for tsc; server tsconfig extends ../tsconfig.json)
 FROM node:20-alpine AS builder
 WORKDIR /app
+COPY tsconfig.json ./
 COPY server/package*.json ./server/
 RUN cd server && npm install
 COPY server/ ./server/

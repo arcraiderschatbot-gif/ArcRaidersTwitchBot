@@ -128,7 +128,7 @@ export class RaidEngine {
         deaths,
         bestHaul: {
           userId: bestHaul.userId,
-          value: bestHaul.totalValue,
+          value: 'totalValue' in bestHaul ? bestHaul.totalValue : (bestHaul as unknown as { value: number }).value,
           name: participants.find(p => p.userId === bestHaul.userId)?.callsign || participants.find(p => p.userId === bestHaul.userId)?.twitchName || 'Unknown',
         },
         mvp: mvp ? {
